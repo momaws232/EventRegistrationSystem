@@ -1,0 +1,249 @@
+package EventManagmentSystem;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+public class EventRegistrationSystem {
+    private static final List<Event> events = new ArrayList<>();
+
+    public static void main(String[] args) {
+        // Set Nimbus Look and Feel
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Main frame setup
+        JFrame frame = new JFrame("Event Management System");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 500);
+
+        // Menu Bar
+        JMenuBar menuBar = new JMenuBar();
+        JMenu fileMenu = new JMenu("File");
+        JMenuItem exitItem = new JMenuItem("Exit");
+        exitItem.addActionListener(e -> System.exit(0));
+        fileMenu.add(exitItem);
+        menuBar.add(fileMenu);
+        frame.setJMenuBar(menuBar);
+
+        // Main panel
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBackground(Color.WHITE);
+
+        // Header
+        JLabel headerLabel = new JLabel("Event Management System", JLabel.CENTER);
+        headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        headerLabel.setForeground(new Color(0, 128, 255));
+        headerLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Buttons with icons
+        JButton addEventButton = new JButton("Add a New Event", new ImageIcon("add_event_icon.png"));
+        styleButton(addEventButton);
+        addEventButton.addActionListener(e -> openAddEventDialog());
+
+        JButton registerAttendeeButton = new JButton("Register Attendees", new ImageIcon("register_icon.png"));
+        styleButton(registerAttendeeButton);
+        registerAttendeeButton.addActionListener(e -> openRegisterAttendeeDialog());
+
+        JButton viewAttendeesButton = new JButton("View Event Attendees", new ImageIcon("view_icon.png"));
+        styleButton(viewAttendeesButton);
+        viewAttendeesButton.addActionListener(e -> openViewAttendeesDialog());
+
+        // Add components to the panel
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Spacer
+        mainPanel.add(headerLabel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Spacer
+        mainPanel.add(addEventButton);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
+        mainPanel.add(registerAttendeeButton);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Spacer
+        mainPanel.add(viewAttendeesButton);
+
+        // Add the panel to the frame and display
+        frame.add(mainPanel);
+        frame.setVisible(true);
+    }
+
+    /**
+     * Styles a JButton to make it consistent with the app theme.
+     */
+    private static void styleButton(JButton button) {
+        button.setFont(new Font("Arial", Font.BOLD, 16));
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setBackground(new Color(230, 230, 250));
+        button.setFocusPainted(false);
+    }
+
+    /**
+     * Opens the dialog to add a new event.
+     */
+    private static void openAddEventDialog() {
+        JDialog dialog = new JDialog((Frame) null, "Add a New Event", true);
+        dialog.setSize(400, 300);
+        dialog.setLayout(new GridLayout(6, 2, 10, 10));
+
+        JLabel eventNameLabel = new JLabel("Event Name:");
+        JTextField eventNameField = new JTextField("Enter event name...");
+        JLabel eventDateLabel = new JLabel("Event Date:");
+        JSpinner dateSpinner = createDateSpinner();
+        JLabel organizerLabel = new JLabel("Organizer Name:");
+        JTextField organizerField = new JTextField("Enter organizer name...");
+
+        JButton createEventButton = new JButton("Create Event");
+        createEventButton.addActionListener(e -> {
+            String name = eventNameField.getText().trim();
+            String organizer = organizerField.getText().trim();
+            Date selectedDate = (Date) dateSpinner.getValue();
+            Date currentDate = new Date();
+
+            // Validate inputs
+            if (name.isEmpty() || organizer.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Please fill in all required fields.");
+                return;
+            }
+            if (selectedDate.before(currentDate)) {
+                JOptionPane.showMessageDialog(dialog, "Event date cannot be in the past.", "Invalid Date", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Event event = new Event(name, selectedDate.toString(), organizer);
+            events.add(event);
+            JOptionPane.showMessageDialog(dialog, "Event created successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dialog.dispose();
+        });
+
+        dialog.add(eventNameLabel);
+        dialog.add(eventNameField);
+        dialog.add(eventDateLabel);
+        dialog.add(dateSpinner);
+        dialog.add(organizerLabel);
+        dialog.add(organizerField);
+        dialog.add(createEventButton);
+
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Creates a JSpinner for selecting a date (cannot be in the past).
+     */
+    private static JSpinner createDateSpinner() {
+        Calendar cal = Calendar.getInstance();
+        Date currentDate = cal.getTime();
+        JSpinner dateSpinner = new JSpinner(new SpinnerDateModel(currentDate, currentDate, null, Calendar.DAY_OF_MONTH));
+        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd");
+        dateSpinner.setEditor(dateEditor);
+        return dateSpinner;
+    }
+
+    /**
+     * Opens the dialog to register attendees to an event.
+     */
+    private static void openRegisterAttendeeDialog() {
+        JDialog dialog = new JDialog((Frame) null, "Register Attendee to Event", true);
+        dialog.setSize(400, 300);
+        dialog.setLayout(new GridLayout(6, 2, 10, 10));
+
+        JLabel attendeeNameLabel = new JLabel("Attendee Name:");
+        JTextField attendeeNameField = new JTextField("Enter attendee name...");
+        JLabel attendeeEmailLabel = new JLabel("Attendee Email:");
+        JTextField attendeeEmailField = new JTextField("Enter attendee email...");
+        JLabel eventLabel = new JLabel("Select Event:");
+        JComboBox<String> eventDropdown = new JComboBox<>(events.stream().map(Event::getEventName).toArray(String[]::new));
+        JLabel attendeeTypeLabel = new JLabel("Attendee Type:");
+        JComboBox<String> attendeeTypeDropdown = new JComboBox<>(new String[]{"Normal", "Premium", "VIP"});
+
+        JButton registerButton = new JButton("Register");
+        registerButton.addActionListener(e -> {
+            String name = attendeeNameField.getText().trim();
+            String email = attendeeEmailField.getText().trim();
+            String eventName = (String) eventDropdown.getSelectedItem();
+            String attendeeType = (String) attendeeTypeDropdown.getSelectedItem();
+
+            if (name.isEmpty() || email.isEmpty() || eventName == null) {
+                JOptionPane.showMessageDialog(dialog, "Please fill in all required fields.");
+                return;
+            }
+
+            Event event = events.stream().filter(ev -> ev.getEventName().equals(eventName)).findFirst().orElse(null);
+            if (event == null) {
+                JOptionPane.showMessageDialog(dialog, "Selected event not found.");
+                return;
+            }
+
+            Attendee attendee;
+            if ("Premium".equals(attendeeType)) {
+                attendee = new PremiumAttendee(name, email);
+            } else if ("VIP".equals(attendeeType)) {
+                attendee = new VipAttendee(name, email);
+            } else {
+                attendee = new Attendee(name, email);
+            }
+
+            event.addAttendee(attendee);
+            JOptionPane.showMessageDialog(dialog, "Attendee registered successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dialog.dispose();
+        });
+
+        dialog.add(attendeeNameLabel);
+        dialog.add(attendeeNameField);
+        dialog.add(attendeeEmailLabel);
+        dialog.add(attendeeEmailField);
+        dialog.add(eventLabel);
+        dialog.add(eventDropdown);
+        dialog.add(attendeeTypeLabel);
+        dialog.add(attendeeTypeDropdown);
+        dialog.add(registerButton);
+
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Opens the dialog to view attendees of an event.
+     */
+    private static void openViewAttendeesDialog() {
+        JDialog dialog = new JDialog((Frame) null, "View Event Attendees", true);
+        dialog.setSize(400, 300);
+        dialog.setLayout(new BorderLayout(10, 10));
+
+        if (events.isEmpty()) {
+            JOptionPane.showMessageDialog(dialog, "No events available.");
+            return;
+        }
+
+        JComboBox<String> eventDropdown = new JComboBox<>(events.stream().map(Event::getEventName).toArray(String[]::new));
+        JTextArea attendeeListArea = new JTextArea();
+        attendeeListArea.setEditable(false);
+
+        eventDropdown.addActionListener(e -> {
+            String eventName = (String) eventDropdown.getSelectedItem();
+            Event selectedEvent = events.stream().filter(ev -> ev.getEventName().equals(eventName)).findFirst().orElse(null);
+
+            if (selectedEvent != null) {
+                StringBuilder attendeeList = new StringBuilder();
+                for (Attendee attendee : selectedEvent.getAttendees()) {
+                    attendeeList.append(attendee.getAttendeeName()).append(" (").append(attendee.getEmail()).append(")");
+                    if (attendee instanceof PremiumAttendee) {
+                        attendeeList.append(" [Premium Code: ").append(((PremiumAttendee) attendee).getPremiumCode()).append("]");
+                    } else if (attendee instanceof VipAttendee) {
+                        attendeeList.append(" [VIP Code: ").append(((VipAttendee) attendee).getVipCode()).append("]");
+                    }
+                    attendeeList.append("\n");
+                }
+                attendeeListArea.setText(attendeeList.toString());
+            }
+        });
+
+        dialog.add(eventDropdown, BorderLayout.NORTH);
+        dialog.add(new JScrollPane(attendeeListArea), BorderLayout.CENTER);
+        dialog.setVisible(true);
+    }
+}

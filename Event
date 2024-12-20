@@ -1,0 +1,30 @@
+package EventManagmentSystem;
+
+import java.util.ArrayList;
+import java.util.List;
+
+class Event {
+    private String eventName;
+    private String eventDate;
+    private String organizerName;
+    private List<Attendee> attendees;
+
+    public Event(String eventName, String eventDate, String organizerName) {
+        this.eventName = eventName;
+        this.eventDate = eventDate;
+        this.organizerName = organizerName;
+        this.attendees = new ArrayList<>();
+    }
+
+    public void addAttendee(Attendee attendee) {
+        attendees.add(attendee);
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public List<Attendee> getAttendees() {
+        return attendees;
+    }
+}

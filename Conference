@@ -1,0 +1,18 @@
+package EventManagmentSystem;
+
+public class Conference extends Event {
+    private String speakerName;
+
+    public Conference(String eventName, String eventDate, String organizer, String speakerName) {
+        super(eventName, eventDate, organizer);
+        this.speakerName = speakerName;
+    }
+
+    public String getSpeakerName() { return speakerName; }
+    public void setSpeakerName(String speakerName) { this.speakerName = speakerName; }
+
+    @Override
+    public String toString() {
+        return super.getEventName() + " [Speaker: " + speakerName + "]";
+    }
+}

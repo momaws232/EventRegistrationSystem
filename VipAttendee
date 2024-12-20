@@ -1,0 +1,31 @@
+package EventManagmentSystem;
+
+import java.util.Random;
+
+public class VipAttendee extends Attendee {
+    private String vipCode;
+
+    public VipAttendee(String attendeeName, String email) {
+        super(attendeeName, email);
+        this.vipCode = generateVipCode();
+    }
+
+    private String generateVipCode() {
+        String prefix = "VIP";
+        StringBuilder code = new StringBuilder();
+        Random random = new Random();
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        for (int i = 0; i < 6; i++) {
+            code.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return prefix + code.toString();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " [VIP Code: " + vipCode + "]";
+    }
+    public String getVipCode() {
+        return vipCode;
+    }
+}

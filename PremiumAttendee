@@ -1,0 +1,31 @@
+package EventManagmentSystem;
+
+import java.util.Random;
+
+public class PremiumAttendee extends Attendee {
+    private String premiumCode;
+
+    public PremiumAttendee(String attendeeName, String email) {
+        super(attendeeName, email);
+        this.premiumCode = generatePremiumCode();
+    }
+
+    private String generatePremiumCode() {
+        String prefix = "PREMIUM";
+        StringBuilder code = new StringBuilder();
+        Random random = new Random();
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        for (int i = 0; i < 8; i++) {
+            code.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return prefix + code.toString();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " [Premium Code: " + premiumCode + "]";
+    }
+    public String getPremiumCode() {
+        return premiumCode;
+    }
+}

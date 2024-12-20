@@ -1,0 +1,32 @@
+package EventManagmentSystem;
+
+abstract class Person {
+    private String attendeeName;
+    private String email;
+
+    public Person(String attendeeName, String email) {
+        this.attendeeName = attendeeName;
+        this.email = email;
+    }
+
+    public String getAttendeeName() {
+        return attendeeName;
+    }
+
+    public void setAttendeeName(String attendeeName) {
+        this.attendeeName = attendeeName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return attendeeName + " (" + email + ")";
+    }
+}
